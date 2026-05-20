@@ -65,7 +65,7 @@ class IntroductionPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Về BTL Learning',
+                        'Về EduCode',
                         style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class IntroductionPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'BTL Learning là một nền tảng học tập trực tuyến hiện đại, được thiết kế đặc biệt để giúp sinh viên và những người mới bắt đầu tiếp cận với lập trình một cách dễ dàng và hiệu quả nhất.',
+                        'EduCode là một nền tảng học tập trực tuyến hiện đại, được thiết kế đặc biệt để giúp sinh viên và những người mới bắt đầu tiếp cận với lập trình một cách dễ dàng và hiệu quả nhất.',
                         style: TextStyle(
                           fontSize: 16,
                           height: 1.6,

@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          'EDU APP',
+                          'EduCode',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 28,

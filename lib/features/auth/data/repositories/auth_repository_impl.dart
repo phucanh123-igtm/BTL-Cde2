@@ -89,7 +89,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> updateProfile({
+  Future<AuthSession> updateProfile({
     String? displayName,
     String? avatarUrl,
   }) async {
@@ -118,6 +118,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final prefs = await SharedPreferences.getInstance();
     final rememberMe = prefs.getBool(_rememberMeKey) ?? true;
     await _saveSession(firebaseUser.uid, updated, rememberMe: rememberMe);
+    
+    return AuthSession(token: firebaseUser.uid, user: updated);
   }
 
   Future<void> _saveSession(
@@ -198,20 +200,24 @@ class AuthRepositoryImpl implements AuthRepository {
     final prefs = await SharedPreferences.getInstance();
     final rememberMe = prefs.getBool(_rememberMeKey) ?? true;
 
+    final firebaseUser = _auth.currentUser;
+
+    // Nếu không chọn ghi nhớ, và đây là lần nạp lại (firebaseUser null hoặc không có token lưu trữ)
+    // thì xóa session. Nhưng nếu đang đăng nhập (firebaseUser != null) thì vẫn giữ lại session.
     if (!rememberMe) {
-      try {
-        if (_auth.currentUser != null) {
-          await _auth.signOut();
-        }
-      } catch (_) {
-        // keep flow resilient
+      final hasLocalToken = prefs.containsKey(_tokenKey);
+      if (!hasLocalToken && firebaseUser == null) {
+        return null;
       }
-      await prefs.remove(_tokenKey);
-      await prefs.remove(_userKey);
+      
+      // Nếu có firebaseUser nhưng không ghi nhớ, ta vẫn trả về session hiện tại
+      if (firebaseUser != null) {
+        final user = await _loadOrCreateUser(firebaseUser, fallbackRole: 'student');
+        return AuthSession(token: firebaseUser.uid, user: user);
+      }
       return null;
     }
 
-    final firebaseUser = _auth.currentUser;
     if (firebaseUser != null) {
       final String token = firebaseUser.uid;
       final user = await _loadOrCreateUser(firebaseUser, fallbackRole: 'student');
@@ -250,5 +256,12 @@ class AuthRepositoryImpl implements AuthRepository {
     await prefs.remove(_tokenKey);
     await prefs.remove(_userKey);
     await prefs.remove(_rememberMeKey);
+  }
+
+  /// Public: Lấy user mới nhất từ Firebase Auth và Realtime DB
+  Future<AppUser?> fetchUserFromFirebase() async {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) return null;
+    return await _loadOrCreateUser(firebaseUser, fallbackRole: 'student');
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:btl/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:btl/features/admin/presentation/pages/admin_dashboard_page.dart';
 
@@ -25,6 +26,18 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     _displayNameController = TextEditingController(
       text: widget.controller.currentUser?.displayName ?? '',
     );
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    _displayNameController.dispose();
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _saveProfile() async {
@@ -43,11 +56,54 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     final image = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 400, maxHeight: 400);
     if (image == null) return;
 
+    // Crop the image before uploading
+    final croppedImage = await ImageCropper().cropImage(
+      sourcePath: image.path,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Cắt ảnh',
+          toolbarColor: Colors.deepPurple,
+          toolbarWidgetColor: Colors.white,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.original,
+          ],
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false,
+        ),
+        IOSUiSettings(
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+            CropAspectRatioPreset.original,
+          ],
+          minimumAspectRatio: 1.0,
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+
+    if (croppedImage == null) return;
+
     setState(() => _isUploadingAvatar = true);
     try {
-      final bytes = await image.readAsBytes();
+      final bytes = await croppedImage.readAsBytes();
       final base64String = 'data:image/jpeg;base64,${base64Encode(bytes)}';
       await widget.controller.updateAvatarUrl(base64String);
+      await widget.controller.reloadUserFromFirebase();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cập nhật ảnh đại diện thành công'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: ${e.toString()}'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isUploadingAvatar = false);
     }
@@ -289,6 +345,4 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     );
   }
 }
-
-
 

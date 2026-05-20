@@ -1,4 +1,4 @@
-# BTL - Ứng dụng học lập trình cơ bản
+# EduCode - Ứng dụng học lập trình cơ bản
 
 Project Flutter + Firebase.
 

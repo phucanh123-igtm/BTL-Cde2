@@ -1,10 +1,8 @@
 {
   "rules": {
     "users": {
-      // Cho phép Admin đọc danh sách tất cả người dùng
       ".read": "auth != null && (auth.token.email == 'admin@gmail.com' || root.child('users').child(auth.uid).child('role').val() == 'admin')",
       "$uid": {
-        // Mỗi người dùng được quyền đọc/ghi dữ liệu của chính mình
         ".read": "auth != null && auth.uid == $uid",
         ".write": "auth != null && (auth.uid == $uid || auth.token.email == 'admin@gmail.com' || root.child('users').child(auth.uid).child('role').val() == 'admin')",
         ".indexOn": ["email", "uid"]
@@ -64,11 +62,9 @@
 
     "sessions": {
       "$uid": {
-        // Mỗi user được quyền đọc/ghi session của chính mình
         ".read": "auth != null && auth.uid == $uid",
         ".write": "auth != null && auth.uid == $uid"
       },
-      // Admin được quyền xem tất cả sessions (để quản lý log)
       ".read": "auth != null && (auth.token.email == 'admin@gmail.com' || root.child('users').child(auth.uid).child('role').val() == 'admin')"
     }
   }

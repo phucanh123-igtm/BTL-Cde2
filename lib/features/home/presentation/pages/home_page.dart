@@ -59,12 +59,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       curve: Curves.easeOutBack,
     );
     _bannerController.forward();
+    widget.controller.addListener(_onControllerChanged);
   }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
     _bannerController.dispose();
     super.dispose();
+  }
+
+  void _onControllerChanged() {
+    if (mounted) setState(() {});
   }
 
   /// Get first character of displayName, default to 'H' if empty

@@ -13,7 +13,7 @@ abstract class AuthRepository {
     required String displayName,
   });
 
-  Future<void> updateProfile({
+  Future<AuthSession> updateProfile({
     String? displayName,
     String? avatarUrl,
   });

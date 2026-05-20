@@ -83,12 +83,9 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.updateProfile(displayName: displayName);
-      final AuthSession? session = await _repository.getSession();
-      if (session != null) {
-        token = session.token;
-        currentUser = session.user;
-      }
+      final session = await _repository.updateProfile(displayName: displayName);
+      token = session.token;
+      currentUser = session.user;
     } catch (e) {
       error = e.toString();
     } finally {
@@ -105,11 +102,26 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.updateProfile(avatarUrl: avatarUrl);
-      final AuthSession? session = await _repository.getSession();
-      if (session != null) {
-        token = session.token;
-        currentUser = session.user;
+      final session = await _repository.updateProfile(avatarUrl: avatarUrl);
+      token = session.token;
+      currentUser = session.user;
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> reloadUserFromFirebase() async {
+    if (currentUser == null) return;
+    isLoading = true;
+    error = null;
+    notifyListeners();
+    try {
+      if (_repository is AuthRepositoryImpl) {
+        final user = await _repository.fetchUserFromFirebase();
+        if (user != null) currentUser = user;
       }
     } catch (e) {
       error = e.toString();

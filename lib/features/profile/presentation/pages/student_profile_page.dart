@@ -54,7 +54,7 @@ class _StudentProfilePageState extends State<StudentProfilePage> {
     if (userId == null) return;
 
     final image = await _imagePicker.pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 400, maxHeight: 400);
-    if (image == null) return;
+    if (image == null || !mounted) return;
 
     // Crop the image before uploading
     final croppedImage = await ImageCropper().cropImage(

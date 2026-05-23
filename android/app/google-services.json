@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:319308367191:android:8441def48e404a3a74aa12",
+        "mobilesdk_app_id": "1:319308367191:android:95f41fedff32fde974aa12",
         "android_client_info": {
-          "package_name": "com.example.btl"
+          "package_name": "com.educode.btl"
         }
       },
       "oauth_client": [],

@@ -41,7 +41,7 @@ dependencies:
   firebase_storage: ^13.4.1
   firebase_analytics: ^12.4.1
   firebase_crashlytics: ^5.2.2
-  image_picker: ^1.2.2
+  image_picker: ^1.1.2
   path_provider: ^2.1.5
   shared_preferences: ^2.3.2
   flutter_markdown: ^0.7.0
